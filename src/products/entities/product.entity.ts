@@ -1,4 +1,5 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { ProductImage } from "./";
 
 @Entity('products')
 export class Product {
@@ -38,16 +39,32 @@ export class Product {
   @Column('text')
   gender: string;
 
-  // tags
-  // images
+  @Column('text', {
+    array: true,
+  })
+  tags: string[];
+
+  @OneToMany(
+    () => ProductImage,
+    (productImage) => productImage.product,
+    { cascade: true }
+  )
+  images?: ProductImage[];
 
   @BeforeInsert()
-  @BeforeUpdate()
   checkSlugInsert() {
     if(!this.slug) {
       this.slug = this.title;
     }
 
+    this.slug = this.slug
+      .toLowerCase()
+      .replaceAll(' ', '_')
+      .replaceAll("'", '');
+  }
+
+  @BeforeUpdate()
+  checkSlugUpdate() {
     this.slug = this.slug
       .toLowerCase()
       .replaceAll(' ', '_')
