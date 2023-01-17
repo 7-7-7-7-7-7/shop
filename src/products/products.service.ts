@@ -56,9 +56,7 @@ export class ProductsService {
 
     return products.map(product => ({
       ...product,
-      images: product.images.map(image => {
-        image.url
-      })
+      images: product.images.map(image => image.url)
     }))
   }
 
