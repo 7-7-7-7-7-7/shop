@@ -151,4 +151,14 @@ export class ProductsService {
     }
     throw new InternalServerErrorException('Error trying to insert product in db!')
   }
+
+  async deleteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');
+
+    try {
+      return await query.delete().where({}).execute();
+    } catch(error) {
+      this.handleDBExceptions(error);
+    }
+  }
 }
