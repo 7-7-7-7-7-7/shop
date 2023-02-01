@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { Repository } from "typeorm";
@@ -28,7 +27,7 @@ export class AuthService {
       delete user.password;
       return {
         ...user,
-        token: this.getJwtToken({ email })
+        token: this.getJwtToken({ userId: user.id })
       };
     } catch(error) {
       this.handleDBErrors(error);
@@ -39,7 +38,7 @@ export class AuthService {
     const { password, email } = signInDto;
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { email: true, password: true }
+      select: { id: true, email: true, password: true }
     });
 
     // ERROR: User not found!
@@ -51,7 +50,7 @@ export class AuthService {
       throw new UnauthorizedException('Credentials are not valid! [password]');
     }
 
-    return { ...user, token: this.getJwtToken({ email: user.email }) }
+    return { ...user, token: this.getJwtToken({ userId: user.id }) }
   }
 
   private getJwtToken(payload: JwtPayload) {
